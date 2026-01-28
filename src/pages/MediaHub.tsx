@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Clock, Trash2, Plus } from 'lucide-react';
+import { Play, Clock, Trash2, Plus, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { resourceService } from '../services/resourceService';
 import type { Resource, ResourceStatus } from '../types';
@@ -18,6 +18,7 @@ const MediaHub = () => {
     // Form State
     const [newUrl, setNewUrl] = useState('');
     const [newTitle, setNewTitle] = useState('');
+    const [addLoading, setAddLoading] = useState(false);
 
     useEffect(() => {
         loadResources();
@@ -32,8 +33,9 @@ const MediaHub = () => {
                 filter === 'all' ? undefined : filter
             );
             setResources(data);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to load resources", error);
+            alert("Error loading resources: " + error.message);
         } finally {
             setLoading(false);
         }
@@ -41,16 +43,20 @@ const MediaHub = () => {
 
     const handleAddResource = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!currentUser || !newUrl) return;
+        if (!currentUser || !newUrl || addLoading) return;
 
+        setAddLoading(true);
         try {
             await resourceService.addResource(currentUser.uid, newUrl, newTitle || undefined);
             setNewUrl('');
             setNewTitle('');
             setIsAddModalOpen(false);
             loadResources(); // Refresh
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to add resource", error);
+            alert("Failed to add resource: " + (error.message || "Unknown error"));
+        } finally {
+            setAddLoading(false);
         }
     };
 
@@ -208,10 +214,17 @@ const MediaHub = () => {
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={!newUrl}
-                                    className="flex-1 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                                    disabled={!newUrl || addLoading}
+                                    className="flex-1 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
-                                    {t('mediaHub.modal.add')}
+                                    {addLoading ? (
+                                        <>
+                                            <Loader2 size={18} className="animate-spin" />
+                                            {t('mediaHub.modal.add')}...
+                                        </>
+                                    ) : (
+                                        t('mediaHub.modal.add')
+                                    )}
                                 </button>
                             </div>
                         </form>
