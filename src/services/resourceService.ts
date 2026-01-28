@@ -7,7 +7,6 @@ import {
     getDoc,
     getDocs,
     query,
-    where,
     orderBy,
     Timestamp
 } from 'firebase/firestore';
@@ -49,15 +48,18 @@ export const resourceService = {
     // Get all resources for a user
     getUserResources: async (userId: string, statusFilter?: ResourceStatus) => {
         const resourcesRef = collection(db, USERS_COLLECTION, userId, 'resources');
-        let q = query(resourcesRef, orderBy('dateAdded', 'desc'));
-
-        if (statusFilter) {
-            // Note: Composite index might be needed for 'status' + 'dateAdded'
-            q = query(resourcesRef, where('status', '==', statusFilter), orderBy('dateAdded', 'desc'));
-        }
+        // Fetch all and filter client-side to avoid composite index requirement
+        const q = query(resourcesRef, orderBy('dateAdded', 'desc'));
 
         const snapshot = await getDocs(q);
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Resource));
+        let resources = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Resource));
+
+        // Client-side filter
+        if (statusFilter) {
+            resources = resources.filter(r => r.status === statusFilter);
+        }
+
+        return resources;
     },
 
     // Get single resource
