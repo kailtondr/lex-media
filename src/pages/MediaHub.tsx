@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { Plus, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { resourceService } from '../services/resourceService';
@@ -10,7 +10,6 @@ import { ResourceCard, PlaylistSection } from '../components/ResourceCard';
 const MediaHub = () => {
     const { t } = useTranslation();
     const { currentUser } = useAuth();
-    const navigate = useNavigate();
     const [resources, setResources] = useState<Resource[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<ResourceStatus | 'all'>('all');
@@ -234,16 +233,6 @@ const MediaHub = () => {
             )}
         </div>
     );
-};
-
-const Badge = ({ status }: { status: ResourceStatus }) => {
-    const { t } = useTranslation();
-    switch (status) {
-        case 'new': return <span className="bg-blue-500/20 text-blue-400 text-[10px] font-bold px-2 py-1 rounded border border-blue-500/20">{t('mediaHub.filters.new').toUpperCase()}</span>;
-        case 'in_progress': return <span className="bg-yellow-500/20 text-yellow-400 text-[10px] font-bold px-2 py-1 rounded border border-yellow-500/20">{t('mediaHub.filters.in_progress').toUpperCase()}</span>;
-        case 'watched': return <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-1 rounded border border-green-500/20">{t('mediaHub.filters.watched').toUpperCase()}</span>;
-        default: return null;
-    }
 };
 
 export default MediaHub;

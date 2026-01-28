@@ -6,12 +6,13 @@ export const seedDatabase = async (userId: string) => {
     console.log("Seeding database for user:", userId);
 
     // 1. Create a YouTube Resource
-    const yi = await resourceService.addResource(
+    const result = await resourceService.addResource(
         userId,
-        'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Classic example
+        'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         'Introduction to Research Methods (Demo)',
         ['research', 'demo']
     );
+    const firstResource = Array.isArray(result) ? result[0] : result;
 
     // 2. Create a "Drive" Resource (Simulated)
     await resourceService.addResource(
@@ -26,7 +27,7 @@ export const seedDatabase = async (userId: string) => {
         userId,
         'Notes on Research Methods',
         '# Key Takeaways\n\n- Research is **systematic**.\n- Only rely on verified sources.\n\nSee [[Advanced Constitutional Law (Archive)]] for cross-reference.',
-        yi.id
+        firstResource.id
     );
 
     // 4. Create a standalone Note / Transcript
