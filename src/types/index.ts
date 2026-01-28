@@ -18,6 +18,11 @@ export interface Resource {
     };
     tags: string[];
     dateAdded: Timestamp;
+    // Playlist support
+    playlistId?: string;        // ID of parent playlist (null for standalone)
+    playlistTitle?: string;     // Title of parent playlist
+    playlistPosition?: number;  // Position in playlist (1-indexed)
+    thumbnail?: string;          // YouTube thumbnail URL
 }
 
 export interface Note {

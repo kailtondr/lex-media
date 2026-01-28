@@ -45,12 +45,16 @@
         },
         "empty": "No resources found. Add one to get started!",
         "initSample": "Or click here to initialize sample data",
+        "standalone": "Standalone Videos",
+        "deleteConfirm": "Are you sure you want to delete this resource?",
         "modal": {
             "title": "Add New Resource",
             "urlLabel": "URL (YouTube / Drive / Nextcloud)",
+            "urlPlaceholder": "Paste YouTube URL or Playlist...",
             "titleLabel": "Title (Optional)",
             "cancel": "Cancel",
-            "add": "Add to Library"
+            "add": "Add to Library",
+            "importing": "Importing playlist..."
         }
     },
     "player": {

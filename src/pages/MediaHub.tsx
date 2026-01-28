@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Clock, Trash2, Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { resourceService } from '../services/resourceService';
 import type { Resource, ResourceStatus } from '../types';
 import { useTranslation } from 'react-i18next';
+import { ResourceCard, PlaylistSection } from '../components/ResourceCard';
 
 const MediaHub = () => {
     const { t } = useTranslation();
@@ -61,8 +62,8 @@ const MediaHub = () => {
     };
 
     const handleDelete = async (id: string, e: React.MouseEvent) => {
-        e.stopPropagation(); // Prevent card click
-        if (!currentUser || !confirm('Are you sure you want to delete this resource?')) return;
+        e.stopPropagation();
+        if (!currentUser || !confirm(t('mediaHub.deleteConfirm') || 'Delete?')) return;
         try {
             await resourceService.deleteResource(currentUser.uid, id);
             setResources(prev => prev.filter(r => r.id !== id));
@@ -70,6 +71,30 @@ const MediaHub = () => {
             console.error("Failed to delete", error);
         }
     };
+
+    // Group resources by playlist
+    const groupedResources = React.useMemo(() => {
+        const playlists: Record<string, Resource[]> = {};
+        const standalone: Resource[] = [];
+
+        resources.forEach(resource => {
+            if (resource.playlistId) {
+                if (!playlists[resource.playlistId]) {
+                    playlists[resource.playlistId] = [];
+                }
+                playlists[resource.playlistId].push(resource);
+            } else {
+                standalone.push(resource);
+            }
+        });
+
+        // Sort playlists by position
+        Object.values(playlists).forEach(playlist => {
+            playlist.sort((a, b) => (a.playlistPosition || 0) - (b.playlistPosition || 0));
+        });
+
+        return { playlists, standalone };
+    }, [resources]);
 
     return (
         <div className="space-y-8">
@@ -103,61 +128,37 @@ const MediaHub = () => {
                 ))}
             </div>
 
-            {/* Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {resources.map((resource) => (
-                    <div
-                        key={resource.id}
-                        onClick={() => navigate(`/resource/${resource.id}`)}
-                        className="group bg-slate-900/50 border border-white/5 rounded-2xl overflow-hidden hover:border-purple-500/30 transition-all hover:shadow-2xl hover:shadow-purple-900/10 cursor-pointer flex flex-col"
-                    >
-                        {/* Thumbnail / Placeholder */}
-                        <div className="aspect-video bg-slate-800 relative group-hover:scale-105 transition-transform duration-500">
-                            {/* If we had real thumbnails, they'd go here. For now, Source Icon or Gradient */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-                                <span className="text-slate-600 uppercase font-black text-2xl tracking-widest opacity-20">
-                                    {resource.sourceType}
-                                </span>
-                            </div>
-
-                            {/* Status Badge */}
-                            <div className="absolute top-3 left-3">
-                                <Badge status={resource.status} />
-                            </div>
-
-                            {/* Action Overlay */}
-                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                                <button className="bg-purple-600 p-3 rounded-full text-white hover:scale-110 transition-transform">
-                                    <Play size={20} fill="currentColor" />
-                                </button>
-                                <button
-                                    onClick={(e) => handleDelete(resource.id, e)}
-                                    className="bg-red-500/80 p-3 rounded-full text-white hover:scale-110 transition-transform"
-                                >
-                                    <Trash2 size={18} />
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="p-4 flex-1 flex flex-col">
-                            <h3 className="font-semibold text-slate-200 mb-2 line-clamp-2" title={resource.title}>
-                                {resource.title}
-                            </h3>
-                            <div className="mt-auto flex items-center justify-between text-xs text-slate-500">
-                                <span className="flex items-center gap-1">
-                                    <Clock size={12} />
-                                    {Math.round((resource.progress.playedSeconds / 60))}m / {Math.round((resource.progress.totalSeconds / 60))}m
-                                </span>
-                                <span>{new Date(resource.dateAdded.seconds * 1000).toLocaleDateString()}</span>
-                            </div>
-                        </div>
-                    </div>
+            {/* Content */}
+            <div className="space-y-8">
+                {/* Playlists */}
+                {Object.entries(groupedResources.playlists).map(([playlistId, playlistResources]) => (
+                    <PlaylistSection
+                        key={playlistId}
+                        playlistTitle={playlistResources[0]?.playlistTitle || 'Playlist'}
+                        resources={playlistResources}
+                        onDelete={handleDelete}
+                    />
                 ))}
 
+                {/* Standalone videos */}
+                {groupedResources.standalone.length > 0 && (
+                    <div className="space-y-4">
+                        {Object.keys(groupedResources.playlists).length > 0 && (
+                            <h3 className="text-lg font-semibold text-white">{t('mediaHub.standalone') || 'Videos'}</h3>
+                        )}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {groupedResources.standalone.map((resource) => (
+                                <ResourceCard key={resource.id} resource={resource} onDelete={handleDelete} />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Empty state */}
                 {resources.length === 0 && !loading && (
                     <div className="col-span-full py-20 text-center text-slate-500">
                         <div className="inline-block p-4 rounded-full bg-slate-900/50 mb-4">
-                            <Play size={32} className="opacity-50" />
+                            {/* Empty icon placeholder */}
                         </div>
                         <p className="mb-4">{t('mediaHub.empty')}</p>
                         <button

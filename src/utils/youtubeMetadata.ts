@@ -71,17 +71,84 @@ export const fetchYouTubeVideoInfo = async (videoId: string): Promise<YouTubeVid
 };
 
 /**
- * Fetch YouTube playlist info
- * Note: This requires YouTube API key. For MVP, we'll use a simpler approach.
+ * Fetch YouTube playlist info using YouTube Data API v3
  */
 export const fetchYouTubePlaylistInfo = async (
-    _playlistId: string,
-    _apiKey?: string
+    playlistId: string,
+    apiKey: string
 ): Promise<YouTubePlaylistInfo | null> => {
-    // For now, return null. User can manually add videos from playlist.
-    // In production, you'd use YouTube Data API v3
-    console.warn('Playlist import requires YouTube API key. Please add videos individually for now.');
-    return null;
+    try {
+        // Fetch playlist metadata
+        const playlistResponse = await fetch(
+            `https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&id=${playlistId}&key=${apiKey}`
+        );
+
+        if (!playlistResponse.ok) {
+            console.error('Failed to fetch playlist info');
+            return null;
+        }
+
+        const playlistData = await playlistResponse.json();
+
+        if (!playlistData.items || playlistData.items.length === 0) {
+            return null;
+        }
+
+        const playlist = playlistData.items[0];
+        const videoCount = playlist.contentDetails.itemCount;
+
+        // Fetch all video IDs from the playlist
+        const videoIds = await fetchPlaylistVideoIds(playlistId, apiKey);
+
+        return {
+            title: playlist.snippet.title,
+            videoIds,
+            videoCount
+        };
+    } catch (error) {
+        console.error('Error fetching playlist info:', error);
+        return null;
+    }
+};
+
+/**
+ * Fetch all video IDs from a YouTube playlist (handles pagination)
+ */
+const fetchPlaylistVideoIds = async (
+    playlistId: string,
+    apiKey: string,
+    pageToken?: string,
+    accumulatedIds: string[] = []
+): Promise<string[]> => {
+    try {
+        let url = `https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&playlistId=${playlistId}&maxResults=50&key=${apiKey}`;
+
+        if (pageToken) {
+            url += `&pageToken=${pageToken}`;
+        }
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            console.error('Failed to fetch playlist items');
+            return accumulatedIds;
+        }
+
+        const data = await response.json();
+
+        const videoIds = data.items.map((item: any) => item.contentDetails.videoId);
+        const allIds = [...accumulatedIds, ...videoIds];
+
+        // If there's a next page, recursively fetch it
+        if (data.nextPageToken) {
+            return fetchPlaylistVideoIds(playlistId, apiKey, data.nextPageToken, allIds);
+        }
+
+        return allIds;
+    } catch (error) {
+        console.error('Error fetching playlist items:', error);
+        return accumulatedIds;
+    }
 };
 
 /**
