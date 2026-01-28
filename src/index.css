@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* Premium Dark Mode Defaults */
+:root {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --primary: 263.4 70% 50.4%;
+  /* Deep Purple */
+  --muted: 240 3.7% 15.9%;
+  --accent: 263.4 70% 50.4%;
+}
+
+@theme {
+  --color-primary: var(--primary);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  /* Extend other colors if needed */
+}
+
+body {
+  /* In v4, we use @apply or just classes. If @apply fails, use standard CSS with theme() */
+  @apply bg-slate-950 text-slate-50 antialiased;
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  @apply bg-white/5 backdrop-blur-lg border border-white/10;
+}

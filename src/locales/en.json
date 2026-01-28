@@ -1,0 +1,78 @@
+{
+    "app": {
+        "title": "LexMedia",
+        "subtitle": "Research & Knowledge Hub",
+        "searchPlaceholder": "Search your second brain...",
+        "addResource": "Add New Resource",
+        "settings": "Settings",
+        "signOut": "Sign Out"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "mediaHub": "Media Hub",
+        "graphBrain": "Graph Brain",
+        "transcription": "Transcription"
+    },
+    "home": {
+        "welcome": "LexMedia",
+        "tagline": "Transform your video feed into a research thesis.",
+        "subTagline": "The first multimedia Second Brain designed for researchers.",
+        "login": "Continue with Google",
+        "features": {
+            "hub": {
+                "title": "Universal Hub",
+                "desc": "Centralize YouTube, Drive, and Nextcloud videos in one place."
+            },
+            "graph": {
+                "title": "Knowledge Graph",
+                "desc": "Connect ideas with WikiLinks and visualize your research."
+            },
+            "transcribe": {
+                "title": "AI Transcription",
+                "desc": "Turn voice memos into text automatically with Whisper."
+            }
+        }
+    },
+    "mediaHub": {
+        "title": "Media Hub",
+        "subtitle": "Manage your watch queue and sources.",
+        "addBtn": "Add Resource",
+        "filters": {
+            "all": "All",
+            "new": "New",
+            "in_progress": "In Progress",
+            "watched": "Watched"
+        },
+        "empty": "No resources found. Add one to get started!",
+        "initSample": "Or click here to initialize sample data",
+        "modal": {
+            "title": "Add New Resource",
+            "urlLabel": "URL (YouTube / Drive / Nextcloud)",
+            "titleLabel": "Title (Optional)",
+            "cancel": "Cancel",
+            "add": "Add to Library"
+        }
+    },
+    "player": {
+        "back": "Back to Library",
+        "notes": "NOTES",
+        "notesPlaceholder": "Notes and transcription features coming in Step 3 & 4."
+    },
+    "transcribe": {
+        "title": "AI Transcription",
+        "subtitle": "Record your thoughts and let Whisper convert them to text.",
+        "recording": "Recording... Tap to stop",
+        "processing": "Transcribing...",
+        "tapToRecord": "Tap to Record",
+        "saveNote": "Save as Note",
+        "transcript": "Transcript",
+        "saved": "Saved to notes!",
+        "failed": "Transcription failed.",
+        "footer": "Powered by OpenAI Whisper (running locally on your device)."
+    },
+    "settings": {
+        "title": "Settings",
+        "language": "Language",
+        "selectLanguage": "Select Interface Language"
+    }
+}

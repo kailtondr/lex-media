@@ -1,0 +1,78 @@
+{
+    "app": {
+        "title": "LexMedia",
+        "subtitle": "Centre de Recherche & Connaissances",
+        "searchPlaceholder": "Rechercher dans votre second cerveau...",
+        "addResource": "Ajouter une ressource",
+        "settings": "Paramètres",
+        "signOut": "Se déconnecter"
+    },
+    "nav": {
+        "dashboard": "Tableau de bord",
+        "mediaHub": "Médiathèque",
+        "graphBrain": "Cerveau Graphique",
+        "transcription": "Transcription"
+    },
+    "home": {
+        "welcome": "LexMedia",
+        "tagline": "Transformez votre flux vidéo en thèse de recherche.",
+        "subTagline": "Le premier Second Cerveau multimédia conçu pour les chercheurs.",
+        "login": "Continuer avec Google",
+        "features": {
+            "hub": {
+                "title": "Hub Universel",
+                "desc": "Centralisez vos vidéos YouTube, Drive et Nextcloud au même endroit."
+            },
+            "graph": {
+                "title": "Graphe de Connaissances",
+                "desc": "Connectez vos idées avec des WikiLinks et visualisez votre recherche."
+            },
+            "transcribe": {
+                "title": "Transcription IA",
+                "desc": "Transformez vos notes vocales en texte automatiquement avec Whisper."
+            }
+        }
+    },
+    "mediaHub": {
+        "title": "Médiathèque",
+        "subtitle": "Gérez votre file d'attente et vos sources.",
+        "addBtn": "Ajouter",
+        "filters": {
+            "all": "Tout",
+            "new": "Nouveau",
+            "in_progress": "En cours",
+            "watched": "Vu"
+        },
+        "empty": "Aucune ressource trouvée. Ajoutez-en une pour commencer !",
+        "initSample": "Ou cliquez ici pour initialiser des données d'exemple",
+        "modal": {
+            "title": "Ajouter une nouvelle ressource",
+            "urlLabel": "URL (YouTube / Drive / Nextcloud)",
+            "titleLabel": "Titre (Optionnel)",
+            "cancel": "Annuler",
+            "add": "Ajouter à la bibliothèque"
+        }
+    },
+    "player": {
+        "back": "Retour à la bibliothèque",
+        "notes": "NOTES",
+        "notesPlaceholder": "Fonctionnalités notes et transcription à venir."
+    },
+    "transcribe": {
+        "title": "Transcription IA",
+        "subtitle": "Enregistrez vos pensées et laissez Whisper les convertir en texte.",
+        "recording": "Enregistrement... Appuyez pour arrêter",
+        "processing": "Transcription en cours...",
+        "tapToRecord": "Appuyez pour enregistrer",
+        "saveNote": "Enregistrer en Note",
+        "transcript": "Transcription",
+        "saved": "Enregistré dans les notes !",
+        "failed": "La transcription a échoué.",
+        "footer": "Propulsé par OpenAI Whisper (exécuté localement sur votre appareil)."
+    },
+    "settings": {
+        "title": "Paramètres",
+        "language": "Langue",
+        "selectLanguage": "Choisir la langue de l'interface"
+    }
+}
