@@ -5,7 +5,7 @@ import ReactPlayer from 'react-player';
 import { useAuth } from '../contexts/AuthContext';
 import { resourceService } from '../services/resourceService';
 import type { Resource } from '../types';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Clock } from 'lucide-react';
 import NoteEditor from '../components/NoteEditor';
 import { useTranslation } from 'react-i18next';
 
@@ -95,41 +95,73 @@ const PlayerPage: React.FC = () => {
     if (!resource) return null;
 
     return (
-        <div className="h-[calc(100vh-6rem)] flex flex-col">
+        <div className="h-full flex flex-col">
+            {/* Header */}
             <div className="mb-4">
                 <button
                     onClick={() => navigate('/media')}
-                    className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4"
+                    className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-3"
                 >
                     <ArrowLeft size={20} />
                     {t('player.back')}
                 </button>
                 <h1 className="text-2xl font-bold text-white">{resource.title}</h1>
+
+                {/* Tags */}
+                {resource.tags && resource.tags.length > 0 && (
+                    <div className="flex gap-2 mt-2 flex-wrap">
+                        {resource.tags.map((tag, i) => (
+                            <span key={i} className="text-xs bg-purple-600/20 text-purple-300 px-2 py-1 rounded border border-purple-500/30">
+                                #{tag}
+                            </span>
+                        ))}
+                    </div>
+                )}
             </div>
 
-            <div className="flex-1 bg-black rounded-2xl overflow-hidden border border-white/10 relative shadow-2xl shadow-black/50">
-                <div className="absolute inset-0">
-                    <ReactPlayer
-                        ref={playerRef}
-                        url={resource.processedUrl}
-                        width="100%"
-                        height="100%"
-                        controls
-                        playing
-                        onReady={handleReady}
-                        onProgress={handleProgress}
-                        onPause={handlePause}
-                        config={{
-                            youtube: {
-                                playerVars: { showinfo: 1 }
-                            }
-                        }}
-                    />
+            {/* Main Content: Video (left) + Notes (right) */}
+            <div className="flex-1 flex gap-6 overflow-hidden">
+                {/* Video Player - 60% */}
+                <div className="flex-[3] flex flex-col min-w-0">
+                    <div className="flex-1 bg-black rounded-2xl overflow-hidden border border-white/10 relative shadow-2xl shadow-black/50">
+                        <div className="absolute inset-0">
+                            <ReactPlayer
+                                ref={playerRef}
+                                url={resource.processedUrl}
+                                width="100%"
+                                height="100%"
+                                controls
+                                playing
+                                onReady={handleReady}
+                                onProgress={handleProgress}
+                                onPause={handlePause}
+                                config={{
+                                    youtube: {
+                                        playerVars: { showinfo: 1 }
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Video metadata below player */}
+                    <div className="mt-4 p-4 bg-slate-900/30 rounded-xl border border-white/5">
+                        <div className="flex items-center justify-between text-sm text-slate-400">
+                            <span className="flex items-center gap-2">
+                                <Clock size={14} />
+                                Progress: {Math.round((resource.progress.playedSeconds / 60))}m / {Math.round((resource.progress.totalSeconds / 60))}m
+                            </span>
+                            <span className="text-xs">
+                                Source: {resource.sourceType.toUpperCase()}
+                            </span>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div className="mt-4 h-96"> {/* Fixed height for editor area */}
-                <NoteEditor resourceId={resource.id} />
+                {/* Notes Editor - 40% */}
+                <div className="flex-[2] flex flex-col min-w-0 bg-slate-900/30 rounded-2xl border border-white/5 overflow-hidden">
+                    <NoteEditor resourceId={resource.id} />
+                </div>
             </div>
         </div>
     );

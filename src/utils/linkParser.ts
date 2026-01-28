@@ -14,8 +14,19 @@ export const parseLink = (url: string): ParsedLink => {
 
     if (url.includes('youtube.com') || url.includes('youtu.be')) {
         type = 'youtube';
-        // react-player handles youtube URLs directly, no complex parsing needed usually,
-        // but we might want to extract ID for thumbnails later.
+        // Extract video ID
+        const patterns = [
+            /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+            /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+        ];
+
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match && match[1]) {
+                id = match[1];
+                break;
+            }
+        }
     } else if (url.includes('drive.google.com')) {
         type = 'drive';
         // Extract ID. Patterns: /file/d/ID/view or id=ID

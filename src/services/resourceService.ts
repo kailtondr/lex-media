@@ -22,11 +22,34 @@ export const resourceService = {
     addResource: async (userId: string, url: string, title?: string, tags: string[] = []) => {
         const parsed = parseLink(url);
 
-        // Basic Metadata Fetching Simulation
-        // In a real app, we might call an edge function to fetch YouTube titles, etc.
+        let finalTitle = title || parsed.originalUrl;
+        let finalTags = [...tags];
+
+        // If it's a YouTube video, fetch metadata
+        if (parsed.type === 'youtube' && parsed.id) {
+            try {
+                const { fetchYouTubeVideoInfo, generateAutoTags } = await import('../utils/youtubeMetadata');
+                const videoInfo = await fetchYouTubeVideoInfo(parsed.id);
+
+                if (videoInfo) {
+                    // Use fetched title if user didn't provide one
+                    if (!title) {
+                        finalTitle = videoInfo.title;
+                    }
+
+                    // Generate auto-tags
+                    const autoTags = generateAutoTags(videoInfo.title, videoInfo.channelTitle);
+                    finalTags = [...new Set([...finalTags, ...autoTags])]; // Merge and dedupe
+                }
+            } catch (error) {
+                console.error('Failed to fetch YouTube metadata:', error);
+                // Continue with original URL as fallback
+            }
+        }
+
         const resourceData: Omit<Resource, 'id'> = {
             userId,
-            title: title || parsed.originalUrl, // Fallback to URL if no title
+            title: finalTitle,
             originalUrl: parsed.originalUrl,
             processedUrl: parsed.processedUrl,
             sourceType: parsed.type,
@@ -36,7 +59,7 @@ export const resourceService = {
                 totalSeconds: 0,
                 lastUpdated: Timestamp.now()
             },
-            tags,
+            tags: finalTags,
             dateAdded: Timestamp.now()
         };
 
