@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play, Clock, Trash2, ChevronDown } from 'lucide-react';
 import type { Resource } from '../types';
+import { usePlayer } from '../contexts/PlayerContext';
 
 interface ResourceCardProps {
     resource: Resource;
     onDelete: (id: string, e: React.MouseEvent) => void;
+    queue?: Resource[]; // Full queue for playback
 }
 
-export const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onDelete }) => {
+export const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onDelete, queue }) => {
     const navigate = useNavigate();
+    const { playResource } = usePlayer();
+
+    const handlePlayClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        playResource(resource, queue);
+    };
 
     return (
         <div
@@ -37,12 +45,17 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onDelete }
 
                 {/* Action Overlay */}
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                    <button className="bg-purple-600 p-3 rounded-full text-white hover:scale-110 transition-transform">
+                    <button
+                        onClick={handlePlayClick}
+                        className="bg-purple-600 p-3 rounded-full text-white hover:scale-110 transition-transform"
+                        title="Play video"
+                    >
                         <Play size={20} fill="currentColor" />
                     </button>
                     <button
                         onClick={(e) => onDelete(resource.id, e)}
                         className="bg-red-500/80 p-3 rounded-full text-white hover:scale-110 transition-transform"
+                        title="Delete"
                     >
                         <Trash2 size={18} />
                     </button>
@@ -65,6 +78,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onDelete }
     );
 };
 
+
 interface PlaylistSectionProps {
     playlistTitle: string;
     resources: Resource[];
@@ -72,30 +86,47 @@ interface PlaylistSectionProps {
 }
 
 export const PlaylistSection: React.FC<PlaylistSectionProps> = ({ playlistTitle, resources, onDelete }) => {
-    const [isExpanded, setIsExpanded] = useState(true);
+    const [isExpanded, setIsExpanded] = React.useState(true);
+    const { playResource } = usePlayer();
+
+    const handlePlayAll = () => {
+        if (resources.length > 0) {
+            playResource(resources[0], resources);
+        }
+    };
 
     return (
         <div className="space-y-4">
-            <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="flex items-center gap-3 w-full text-left group"
-            >
-                <ChevronDown
-                    size={20}
-                    className={`text-purple-400 transition-transform ${isExpanded ? '' : '-rotate-90'}`}
-                />
-                <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white group-hover:text-purple-300 transition-colors">
-                        {playlistTitle}
-                    </h3>
-                    <p className="text-xs text-slate-500">{resources.length} videos</p>
-                </div>
-            </button>
+            <div className="flex items-center gap-3 w-full">
+                <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="flex items-center gap-3 flex-1 text-left group"
+                >
+                    <ChevronDown
+                        size={20}
+                        className={`text-purple-400 transition-transform ${isExpanded ? '' : '-rotate-90'}`}
+                    />
+                    <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-white group-hover:text-purple-300 transition-colors">
+                            {playlistTitle}
+                        </h3>
+                        <p className="text-xs text-slate-500">{resources.length} videos</p>
+                    </div>
+                </button>
+
+                <button
+                    onClick={handlePlayAll}
+                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                    <Play size={16} fill="currentColor" />
+                    Play All
+                </button>
+            </div>
 
             {isExpanded && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pl-8">
                     {resources.map((resource) => (
-                        <ResourceCard key={resource.id} resource={resource} onDelete={onDelete} />
+                        <ResourceCard key={resource.id} resource={resource} onDelete={onDelete} queue={resources} />
                     ))}
                 </div>
             )}
