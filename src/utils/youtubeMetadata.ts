@@ -46,6 +46,37 @@ export const isYouTubePlaylist = (url: string): boolean => {
 };
 
 /**
+ * Get YouTube thumbnail URL with fallback options
+ * Tries multiple quality levels in order: maxres -> sd -> hq -> mq -> default
+ */
+export const getYouTubeThumbnail = async (videoId: string): Promise<string | null> => {
+    // Try different thumbnail qualities in order
+    const thumbnailUrls = [
+        `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`, // 1920x1080
+        `https://img.youtube.com/vi/${videoId}/sddefault.jpg`,     // 640x480
+        `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,     // 480x360
+        `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,     // 320x180
+        `https://img.youtube.com/vi/${videoId}/default.jpg`,       // 120x90
+    ];
+
+    // Try each URL to see if it exists (maxresdefault doesn't exist for all videos)
+    for (const url of thumbnailUrls) {
+        try {
+            const response = await fetch(url, { method: 'HEAD' });
+            if (response.ok) {
+                return url;
+            }
+        } catch (error) {
+            // Continue to next quality level
+            continue;
+        }
+    }
+
+    // Last resort: use the first URL even if check failed
+    return thumbnailUrls[2]; // hqdefault is most reliable
+};
+
+/**
  * Fetch YouTube video metadata using oEmbed (no API key needed)
  */
 export const fetchYouTubeVideoInfo = async (videoId: string): Promise<YouTubeVideoInfo | null> => {
@@ -58,14 +89,27 @@ export const fetchYouTubeVideoInfo = async (videoId: string): Promise<YouTubeVid
 
         const data = await response.json();
 
+        // Get high-quality thumbnail using our fallback method
+        const thumbnail = await getYouTubeThumbnail(videoId);
+
         return {
             title: data.title || 'Unknown Video',
-            thumbnail: data.thumbnail_url,
+            thumbnail: thumbnail || data.thumbnail_url, // Fallback to oEmbed thumbnail
             channelTitle: data.author_name,
             description: ''
         };
     } catch (error) {
         console.error('Failed to fetch YouTube video info:', error);
+        // Even on error, try to return at least a thumbnail
+        const thumbnail = await getYouTubeThumbnail(videoId);
+        if (thumbnail) {
+            return {
+                title: 'Unknown Video',
+                thumbnail,
+                channelTitle: '',
+                description: ''
+            };
+        }
         return null;
     }
 };

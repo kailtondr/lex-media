@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Clock, Trash2, ChevronDown } from 'lucide-react';
+import { Play, Clock, Trash2, ChevronDown, ArrowUpDown } from 'lucide-react';
 import type { Resource } from '../types';
 import { usePlayer } from '../contexts/PlayerContext';
 
@@ -85,15 +85,44 @@ interface PlaylistSectionProps {
     onDelete: (id: string, e: React.MouseEvent) => void;
 }
 
+type SortOption = 'position' | 'dateOldest' | 'dateNewest';
+
 export const PlaylistSection: React.FC<PlaylistSectionProps> = ({ playlistTitle, resources, onDelete }) => {
     const [isExpanded, setIsExpanded] = React.useState(true);
+    const [sortBy, setSortBy] = React.useState<SortOption>('position');
+    const [showSortMenu, setShowSortMenu] = React.useState(false);
     const { playResource } = usePlayer();
 
+    // Sort resources based on selected option
+    const sortedResources = React.useMemo(() => {
+        const sorted = [...resources];
+
+        switch (sortBy) {
+            case 'position':
+                // Original playlist order
+                return sorted.sort((a, b) => (a.playlistPosition || 0) - (b.playlistPosition || 0));
+            case 'dateOldest':
+                // Oldest first
+                return sorted.sort((a, b) => a.dateAdded.seconds - b.dateAdded.seconds);
+            case 'dateNewest':
+                // Newest first
+                return sorted.sort((a, b) => b.dateAdded.seconds - a.dateAdded.seconds);
+            default:
+                return sorted;
+        }
+    }, [resources, sortBy]);
+
     const handlePlayAll = () => {
-        if (resources.length > 0) {
-            playResource(resources[0], resources);
+        if (sortedResources.length > 0) {
+            playResource(sortedResources[0], sortedResources);
         }
     };
+
+    const sortOptions: { value: SortOption; label: string }[] = [
+        { value: 'position', label: 'Position originale' },
+        { value: 'dateOldest', label: 'Plus ancien → Récent' },
+        { value: 'dateNewest', label: 'Plus récent → Ancien' },
+    ];
 
     return (
         <div className="space-y-4">
@@ -114,6 +143,37 @@ export const PlaylistSection: React.FC<PlaylistSectionProps> = ({ playlistTitle,
                     </div>
                 </button>
 
+                {/* Sort Dropdown */}
+                <div className="relative">
+                    <button
+                        onClick={() => setShowSortMenu(!showSortMenu)}
+                        className="flex items-center gap-2 px-3 py-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-sm"
+                        title="Trier"
+                    >
+                        <ArrowUpDown size={16} />
+                        <span className="hidden sm:inline">Trier</span>
+                    </button>
+                    {showSortMenu && (
+                        <div className="absolute right-0 top-full mt-2 bg-slate-800 rounded-lg shadow-xl border border-white/10 py-2 min-w-[200px] z-10">
+                            {sortOptions.map((option) => (
+                                <button
+                                    key={option.value}
+                                    onClick={() => {
+                                        setSortBy(option.value);
+                                        setShowSortMenu(false);
+                                    }}
+                                    className={`w-full px-4 py-2 text-sm text-left transition-colors ${sortBy === option.value
+                                            ? 'bg-purple-600 text-white'
+                                            : 'text-slate-300 hover:bg-white/5'
+                                        }`}
+                                >
+                                    {option.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
                 <button
                     onClick={handlePlayAll}
                     className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-lg transition-colors"
@@ -125,8 +185,8 @@ export const PlaylistSection: React.FC<PlaylistSectionProps> = ({ playlistTitle,
 
             {isExpanded && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pl-8">
-                    {resources.map((resource) => (
-                        <ResourceCard key={resource.id} resource={resource} onDelete={onDelete} queue={resources} />
+                    {sortedResources.map((resource) => (
+                        <ResourceCard key={resource.id} resource={resource} onDelete={onDelete} queue={sortedResources} />
                     ))}
                 </div>
             )}

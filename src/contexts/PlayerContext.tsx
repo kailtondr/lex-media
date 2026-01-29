@@ -22,6 +22,10 @@ interface PlayerContextType {
     setIsShuffle: (shuffle: boolean) => void;
     stopPlayback: () => void;
     seekTo: (seconds: number) => void;
+    portalTarget: HTMLElement | null;
+    setPortalTarget: (target: HTMLElement | null) => void;
+    playerSlotRect: DOMRect | null;
+    setPlayerSlotRect: (rect: DOMRect | null) => void;
 
     // YouTube Player Reference
     playerRef: React.MutableRefObject<any>;
@@ -48,6 +52,8 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const [queue, setQueue] = useState<Resource[]>([]);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
+    const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+    const [playerSlotRect, setPlayerSlotRect] = useState<DOMRect | null>(null);
 
     // Refs for callbacks (avoid closure issues)
     const currentResourceRef = useRef<Resource | null>(null);
@@ -288,6 +294,10 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         setIsShuffle,
         stopPlayback,
         seekTo,
+        portalTarget,
+        setPortalTarget,
+        playerSlotRect,
+        setPlayerSlotRect,
         playerRef,
         onPlayerReady,
         onPlayerStateChange,

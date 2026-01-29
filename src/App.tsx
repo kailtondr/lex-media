@@ -6,13 +6,14 @@ import { PlayerProvider } from './contexts/PlayerContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import GlobalPlayer from './components/GlobalPlayer';
 
-// Placeholder pages for now
+// Pages
 import MediaHub from './pages/MediaHub';
 import PlayerPage from './pages/PlayerPage';
 import GraphView from './pages/GraphView';
-// const Brain = () => <div className="text-slate-400">Graph View - Coming Soon</div>;
 import TranscribePage from './pages/TranscribePage';
 import SettingsPage from './pages/SettingsPage';
+import NotesPage from './pages/NotesPage';
+import TagsPage from './pages/TagsPage';
 
 // ...
 
@@ -43,6 +44,21 @@ function App() {
               <Route path="/brain" element={
                 <ProtectedRoute>
                   <GraphView />
+                </ProtectedRoute>
+              } />
+              <Route path="/notes" element={
+                <ProtectedRoute>
+                  <NotesPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/notes/:id" element={
+                <ProtectedRoute>
+                  <NotesPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/tags" element={
+                <ProtectedRoute>
+                  <TagsPage />
                 </ProtectedRoute>
               } />
               <Route path="/transcribe" element={

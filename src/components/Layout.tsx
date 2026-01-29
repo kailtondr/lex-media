@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, PlayCircle, BookOpen, Mic, Search, LogOut, Settings } from 'lucide-react';
+import { Home, PlayCircle, BookOpen, Mic, Search, LogOut, Settings, FileText, Tag } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 
@@ -24,6 +24,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const menuItems = [
         { icon: Home, label: t('nav.dashboard'), path: '/' },
         { icon: PlayCircle, label: t('nav.mediaHub'), path: '/media' },
+        { icon: FileText, label: 'Notes', path: '/notes' },
+        { icon: Tag, label: 'Tags', path: '/tags' },
         { icon: BookOpen, label: t('nav.graphBrain'), path: '/brain' },
         { icon: Mic, label: t('nav.transcription'), path: '/transcribe' },
     ];
