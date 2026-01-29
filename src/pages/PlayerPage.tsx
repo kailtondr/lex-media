@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { resourceService } from '../services/resourceService';
-import type { Resource } from '../types';
 import {
     ArrowLeft, Loader2, Play, Pause, SkipForward, SkipBack,
     Repeat, Shuffle, Clock, ExternalLink, Plus, X, Tag as TagIcon

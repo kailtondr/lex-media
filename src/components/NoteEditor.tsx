@@ -28,7 +28,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ resourceId, initialNoteId }) =>
     const [wordCount, setWordCount] = useState(0);
     const [charCount, setCharCount] = useState(0);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const saveTimeoutRef = useRef<number>();
+    const saveTimeoutRef = useRef<number | undefined>(undefined);
 
     // Load existing note if provided or if we want to auto-load the "main" note for this resource
     useEffect(() => {
