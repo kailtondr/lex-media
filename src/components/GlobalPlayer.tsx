@@ -262,13 +262,13 @@ const GlobalPlayer: React.FC = () => {
             pointerEvents: 'auto',
         };
     } else if (showMiniPlayer) {
-        // Mini player position - bottom left corner
+        // Mini player position - above bottom nav on mobile
         containerStyle = {
             ...containerStyle,
-            bottom: '5.5rem',
-            left: '1.5rem',
-            width: '280px',
-            height: '158px', // Fixed height instead of aspect-ratio for YouTube API
+            bottom: '8rem', // Higher to clear bottom nav
+            left: '1rem',
+            width: '240px',
+            height: '135px',
             borderRadius: '0.75rem',
             boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)',
             opacity: 1,
